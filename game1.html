@@ -41,14 +41,20 @@ var Paddle = function() {
 }
 
 var Game = function() {
+    var canvas = document.querySelector('#id-canvas')
+    var context = canvas.getContext('2d')
     var g = {
       actions: {},
       keydowns: {},
     }
-    var canvas = document.querySelector('#id-canvas')
-    var context = canvas.getContext('2d')
+
     g.canvas = canvas
     g.context = context
+
+    // draw image
+    g.drawImage = function(paddle) {
+      g.context.drawImage(paddle.image, paddle.x, paddle.y)
+    }
 
     window.addEventListener('keydown', function() {
       g.keydowns[event.key] = true
@@ -89,46 +95,22 @@ var _main = function() {
 
     var paddle = Paddle()
     // two recorded states
-    var leftDown = false
-    var rightDown = false
 
-    // events
-    window.addEventListener('keydown', function(event){
-        var k = event.key
-        // log(event)
-        if (k === 'a') {
-            leftDown = true
-        } else if (k === 'd') {
-            rightDown = true
-        }
-
+    game.registerAction('a', function() {
+      paddle.moveLeft()
     })
 
-    window.addEventListener('keyup', function(event){
-        var k = event.key
-        // log(event)
-        if (k === 'a') {
-            leftDown = false
-        } else if (k === 'd') {
-            rightDown = false
-        }
-
+    game.registerAction('d', function() {
+      paddle.moveRight()
     })
 
     game.update = function() {
-      // update x and y , press a or d then update x
-      if (leftDown) {
-          paddle.moveLeft()
-          // paddle.x -= paddle.speed
-      } else if (rightDown) {
-          paddle.moveRight()
-          // paddle.x += paddle.speed
-      }
+      //update
     }
 
     game.draw = function() {
       // draw
-      game.context.drawImage(paddle.image, paddle.x, paddle.y)
+      game.drawImage(paddle)
     }
 }
 
