@@ -65,7 +65,7 @@ var Game = function() {
     })
 
     g.registerAction = function(key, callback) {
-      g.keydowns[key] = callback
+      g.actions[key] = callback
     }
 
     // timer
@@ -94,15 +94,20 @@ var _main = function() {
     var game = Game()
 
     var paddle = Paddle()
-    // two recorded states
+    // var ball = Ball()
 
     game.registerAction('a', function() {
+      // log('a')
       paddle.moveLeft()
     })
 
     game.registerAction('d', function() {
       paddle.moveRight()
     })
+
+    // game.registerAction('f', function() {
+    //   ball.fire()
+    // })
 
     game.update = function() {
       //update
