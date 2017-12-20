@@ -10,13 +10,17 @@
         </style>
     </head>
     <body>
-        <canvas id="id-canvas" width="400" height="300"></canvas>
+        <canvas id="id-canvas" width="800" height="600"></canvas>
+
 <script type="text/javascript">
+// 最外层只能有函数，不能有变量，代码应该是以函数为基本单位的
+
 var log = console.log.bind(console)
 var canvas = document.querySelector('#id-canvas')
 var context = canvas.getContext('2d')
-var x = 150
-var y = 200
+var x = 300
+var y = 400
+var speed = 5
 
 var img = new Image()
 img.src = 'bilibili.jpeg'
@@ -25,17 +29,54 @@ img.onload = function () {
     context.drawImage(img, x, y)    
 }
 
+// two recorded states
+var leftDown = false
+var rightDown = false
+
 // events
 window.addEventListener('keydown', function(event){
     var k = event.key
     // log(event)
-    if (k == 'a') {
-        x -= 10
-    } else if (k == 'd') {
-        x += 10
+    if (k === 'a') {
+        leftDown = true
+    } else if (k === 'd') {
+        rightDown = true
     }
 
 })
+
+window.addEventListener('keyup', function(event){
+    var k = event.key
+    // log(event)
+    if (k === 'a') {
+        leftDown = false
+    } else if (k === 'd') {
+        rightDown = false
+    }
+
+})
+
+// 一秒钟走30次，挡板移动更"流畅"
+setInterval(function(){
+    // update x and y , press a or d then update x 
+    if (leftDown) {
+        x -= speed
+    } else if (rightDown) {
+        x += speed
+    }
+
+
+    
+    // draw
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    context.drawImage(img, x, y)
+}, 1000/30)
+
+var _main() = function() {
+
+}
+
+_main()
     
 </script>
     </body>
