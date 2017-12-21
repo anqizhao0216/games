@@ -30,12 +30,16 @@ var Ball = function() {
         image: image,
         x: 300,
         y: 400,
-        speedX: 15,
-        speedY: 15,
+        speedX: 10,
+        speedY: 10,
         fired: false,
     }
     o.fire = function() {
       o.fired = true
+    }
+    // bounce
+    o.bounce = function() {
+      o.speedY *= -1
     }
     o.move = function() {
       if (o.fired) {
@@ -47,6 +51,8 @@ var Ball = function() {
           if (o.y < 0 || o.y > 600) {
             o.speedY = -o.speedY
           }
+
+
 
           // move
           o.x += o.speedX
@@ -62,7 +68,7 @@ var Paddle = function() {
         image: image,
         x: 300,
         y: 500,
-        speed: 25,
+        speed: 20,
     }
     o.moveLeft = function() {
         o.x -= o.speed
@@ -82,6 +88,15 @@ var Paddle = function() {
     return o
 }
 
+var rectIntersects = function(a, b) {
+  var o = a
+  if (b.y > o.y && b.y < o.y + o.image.height) {
+    if (b.x > o.x && b.x < o.x + o.image.width) {
+      return true
+    }
+  }
+  return false
+}
 var Block = function() {
     var image = imageFromPath('block.jpeg')
     var o = {
@@ -94,6 +109,9 @@ var Block = function() {
     }
     o.kill = function() {
       o.alive = false
+    }
+    o.collide = function(b) {
+      return rectIntersects(o, b) || rectIntersects(b, o)
     }
     return o
 }
@@ -153,6 +171,15 @@ var _main = function() {
 
     var paddle = Paddle()
     var ball = Ball()
+
+    var blocks = []
+    for (var i = 0; i < 3; i++) {
+      var b = Block()
+      // initialize block's positions
+      b.x = i * 150
+      b.y = 50
+      blocks.push(b)
+    }
     var block = Block()
 
     game.registerAction('a', function() {
@@ -171,18 +198,38 @@ var _main = function() {
     game.update = function() {
       ball.move()
       if (paddle.collide(ball)) {
-        ball.speedY *= -1
+        //  这里应该调用一个 ball.反弹() 来实现
+        ball.bounce()
+        // ball.speedY *= -1
       }
+      // 判断 ball 和 block 相撞
+      for (var i = 0; i < 3; i++) {
+        var block = blocks[i]
+        if (block.collide(ball)) {
+          log('block')
+          block.kill()
+          ball.bounce()
+        }
+      }
+
     }
 
     game.draw = function() {
       // draw
       game.drawImage(paddle)
       game.drawImage(ball)
+
       // draw block
-      if (block.alive) {
+      for (var i = 0; i < 3; i++) {
+        var block = blocks[i]
+        if (block.alive) {
           game.drawImage(block)
+        }
       }
+
+      // if (block.alive) {
+      //     game.drawImage(block)
+      // }
 
     }
 }
