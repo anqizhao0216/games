@@ -23,19 +23,60 @@ var imageFromPath = function(path) {
     return img
 }
 
+var Ball = function() {
+    var image = imageFromPath('ball.jpeg')
+    var o = {
+        image: image,
+        x: 300,
+        y: 400,
+        speedX: 20,
+        speedY: 20,
+        fired: false,
+    }
+    o.fire = function() {
+      o.fired = true
+    }
+    o.move = function() {
+      if (o.fired) {
+          // log('move')
+          if (o.x < 0 || o.x > 800) {
+            o.speedX = -o.speedX
+          }
+
+          if (o.y < 0 || o.y > 600) {
+            o.speedY = -o.speedY
+          }
+
+          // move
+          o.x += o.speedX
+          o.y += o.speedY
+      }
+    }
+    return o
+}
+
 var Paddle = function() {
     var image = imageFromPath('bilibili.jpeg')
     var o = {
         image: image,
         x: 300,
-        y: 400,
-        speed: 5,
+        y: 500,
+        speed: 25,
     }
     o.moveLeft = function() {
         o.x -= o.speed
     }
     o.moveRight = function() {
         o.x += o.speed
+    }
+    o.collide = function(ball) {
+      if (ball.y + ball.image.height > o.y) {
+        if (ball.x > o.x && ball.x < o.x + o.image.width) {
+          // log('collide')
+          return true
+        }
+      }
+      return false
     }
     return o
 }
@@ -94,7 +135,7 @@ var _main = function() {
     var game = Game()
 
     var paddle = Paddle()
-    // var ball = Ball()
+    var ball = Ball()
 
     game.registerAction('a', function() {
       // log('a')
@@ -105,17 +146,21 @@ var _main = function() {
       paddle.moveRight()
     })
 
-    // game.registerAction('f', function() {
-    //   ball.fire()
-    // })
+    game.registerAction('f', function() {
+      ball.fire()
+    })
 
     game.update = function() {
-      //update
+      ball.move()
+      if (paddle.collide(ball)) {
+        ball.speedY *= -1
+      }
     }
 
     game.draw = function() {
       // draw
       game.drawImage(paddle)
+      game.drawImage(ball)
     }
 }
 
