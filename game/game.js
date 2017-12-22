@@ -25,24 +25,34 @@ var Game = function(fps) {
     g.registerAction = function(key, callback) {
       g.actions[key] = callback
     }
+    window.fps = 30
+    var runloop = function() {
+      log(window.fps)
+      // events
+      var actions = Object.keys(g.actions)
+      for (var i = 0; i < actions.length; i++) {
+        var key = actions[i]
+        if (g.keydowns[key]) {
+          // 如果按键按下，调用注册的 action
+          g.actions[key]()
+        }
+      }
+      // update
+      g.update()
+      // clear
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      // draw
+      g.draw()
+
+      //next run loop
+      setTimeout(function() {
+        runloop()
+      }, 1000/window.fps)
+    }
 
     // timer
-    setInterval(function(){
-        // events
-        var actions = Object.keys(g.actions)
-        for (var i = 0; i < actions.length; i++) {
-          var key = actions[i]
-          if (g.keydowns[key]) {
-            // 如果按键按下，调用注册的 action
-            g.actions[key]()
-          }
-        }
-        // update
-        g.update()
-        // clear
-        context.clearRect(0, 0, canvas.width, canvas.height)
-        // draw
-        g.draw()
+    setTimeout(function(){
+        runloop()
     }, 1000/fps)
 
     return g
