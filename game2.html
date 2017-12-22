@@ -72,9 +72,15 @@ var Paddle = function() {
     }
     o.moveLeft = function() {
         o.x -= o.speed
+        if (o.x < 0) {
+          o.x = 0
+        }
     }
     o.moveRight = function() {
         o.x += o.speed
+        if (o.x > 800 - o.image.width) {
+          o.x = 800 - o.image.width
+        }
     }
     o.collide = function(ball) {
       if (ball.y + ball.image.height > o.y) {
@@ -111,7 +117,7 @@ var Block = function() {
       o.alive = false
     }
     o.collide = function(b) {
-      return rectIntersects(o, b) || rectIntersects(b, o)
+      return o.alive && (rectIntersects(o, b) || rectIntersects(b, o))
     }
     return o
 }
@@ -173,7 +179,7 @@ var _main = function() {
     var ball = Ball()
 
     var blocks = []
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 5; i++) {
       var b = Block()
       // initialize block's positions
       b.x = i * 150
@@ -203,9 +209,9 @@ var _main = function() {
         // ball.speedY *= -1
       }
       // 判断 ball 和 block 相撞
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < 5; i++) {
         var block = blocks[i]
-        if (block.collide(ball)) {
+        if (block.alive && block.collide(ball)) {
           log('block')
           block.kill()
           ball.bounce()
@@ -220,7 +226,7 @@ var _main = function() {
       game.drawImage(ball)
 
       // draw block
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < 5; i++) {
         var block = blocks[i]
         if (block.alive) {
           game.drawImage(block)
