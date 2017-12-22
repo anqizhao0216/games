@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>game 1</title>
+        <style type="text/css">
+            canvas {
+                border: 1px black solid;
+            }
+        </style>
+        <script src='game.js'></script>
+        <script src="block.js"></script>
+        <script src="ball.js"></script>
+        <script src="paddle.js"></script>
+        <script src="utils.js"></script>
+    </head>
+    <body>
+      <!-- 直播编程写游戏-1 完成版  12.20 LA -->
+        <canvas id="id-canvas" width="800" height="600"></canvas>
+
+<script type="text/javascript">
+// 最外层只能有函数，不能有变量，代码应该是以函数为基本单位的
+
+
+var _main = function() {
+    var game = Game(30)
+
+    var paddle = Paddle()
+    var ball = Ball()
+
+    var blocks = []
+    for (var i = 0; i < 5; i++) {
+      var b = Block()
+      // initialize block's positions
+      b.x = i * 150
+      b.y = 50
+      blocks.push(b)
+    }
+    var block = Block()
+
+    var paused = false
+    game.registerAction('a', function() {
+      // log('a')
+      paddle.moveLeft()
+    })
+
+    game.registerAction('d', function() {
+      paddle.moveRight()
+    })
+
+    game.registerAction('f', function() {
+      ball.fire()
+    })
+
+    window.addEventListener('keydown', function(event) {
+      if (event.key == 'p') {
+        paused = !paused
+      }
+    })
+
+    game.update = function() {
+      if (!paused) {
+          ball.move()
+      }
+
+      if (paddle.collide(ball)) {
+        //  这里应该调用一个 ball.反弹() 来实现
+        ball.bounce()
+        // ball.speedY *= -1
+      }
+      // 判断 ball 和 block 相撞
+      for (var i = 0; i < 5; i++) {
+        var block = blocks[i]
+        if (block.alive && block.collide(ball)) {
+          log('block')
+          block.kill()
+          ball.bounce()
+        }
+      }
+
+    }
+
+    game.draw = function() {
+      // draw
+      game.drawImage(paddle)
+      game.drawImage(ball)
+
+      // draw block
+      for (var i = 0; i < 5; i++) {
+        var block = blocks[i]
+        if (block.alive) {
+          game.drawImage(block)
+        }
+      }
+    }
+}
+
+_main()
+
+</script>
+    </body>
+</html>
