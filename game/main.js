@@ -41,6 +41,7 @@ var _main = function() {
 
     var paddle = Paddle()
     var ball = Ball()
+    var score = 0
 
     blocks = loadLevel(1)
 
@@ -74,6 +75,8 @@ var _main = function() {
         if (block.alive && block.collide(ball)) {
           log('block')
           block.kill()
+          // update score
+          score += 100
           ball.bounce()
         }
       }
@@ -94,7 +97,7 @@ var _main = function() {
       }
 
       // draw labels
-      game.context.fillText('Hello Ali', 10, 50)
+      game.context.fillText(score, 10, 400)
     }
 }
 
