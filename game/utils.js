@@ -1,7 +1,7 @@
+var e = sel => document.querySelector(sel)
 
 var log = console.log.bind(console)
 
-// img, x, y => a paddle object
 var imageFromPath = function(path) {
     var img = new Image()
     img.src = path
@@ -9,11 +9,11 @@ var imageFromPath = function(path) {
 }
 
 var rectIntersects = function(a, b) {
-  var o = a
-  if (b.y > o.y && b.y < o.y + o.image.height) {
-    if (b.x > o.x && b.x < o.x + o.image.width) {
-      return true
+    var o = a
+    if (b.y > o.y && b.y < o.y + o.image.height) {
+        if (b.x > o.x && b.x < o.x + o.image.width) {
+            return true
+        }
     }
-  }
-  return false
+    return false
 }
