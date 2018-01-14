@@ -10,12 +10,13 @@
 <script type="text/javascript">
 // var log = console.log 貌似直接赋值就可以了，所以bind在这里的作用是什么呢
 var log = console.log.bind(console) // console 是一个什么对象？
-
 var canvas = document.querySelector('#id-canvas')
-
 var context = canvas.getContext('2d') // 目前只支持二维
 
-log('hello')
+var img = new Image() // 创建一个<img> 。等价于 document.createElement('img')
+img.src = 'paddle.png'
+log(img)
+
 
 
 
