@@ -15,6 +15,7 @@
 
 <script type="text/javascript">
 // var log = console.log 貌似直接赋值就可以了，所以bind在这里的作用是什么呢
+// bind 绑定console对象，将this指向console对象。并返回一个函数。
 var log = console.log.bind(console) // console 是一个什么对象？
 // log 是一个函数
 
@@ -25,13 +26,22 @@ var log = console.log.bind(console) // console 是一个什么对象？
 
 
 
+var imageFromPath = function(path) {
+  var img = new Image()
+  img.src = path
+  return img
+}
 // 2. 定义一个paddle对象
 // 匿名函数内部，定义一个对象，然后返回这个对象？
+// 这是工厂模式
 var Paddle = function () {
+  var image = imageFromPath('paddle.png')
   var o = {
-
+    image: image,
+    x: 100,
+    y: 200,
+    speed: 5,
   }
-
   return o
 }
 
@@ -39,18 +49,19 @@ var __main = function () {
   var canvas = document.querySelector('#id-canvas')
   var context = canvas.getContext('2d') // 目前只支持二维
 
-  var x = 100
-  var y = 200
-  var speed = 5
+  var paddle = new Paddle();
+  // var x = 100
+  // var y = 200
+  // var speed = 5
 
-  var img = new Image() // 创建一个<img> 。等价于 document.createElement('img')
-  img.src = 'paddle.png' // 脚本执行后，图片开始装载
-  log(img)
-  // 若调用 drawImage 时，图片没装载完，那什么都不会发生（在一些旧的浏览器中可能会抛出异常）。
-  // 因此你应该用load事件来保证不会在加载完毕之前使用这个图片
-  img.onload = function() {
-      context.drawImage(img, x, y)
-  }
+  // var img = new Image() // 创建一个<img> 。等价于 document.createElement('img')
+  // img.src = 'paddle.png' // 脚本执行后，图片开始装载
+  // log(img)
+  // // 若调用 drawImage 时，图片没装载完，那什么都不会发生（在一些旧的浏览器中可能会抛出异常）。
+  // // 因此你应该用load事件来保证不会在加载完毕之前使用这个图片
+  // img.onload = function() {
+  //     context.drawImage(img, x, y)
+  // }
 
   var leftDown = false
   var rightDown = false
@@ -88,13 +99,13 @@ var __main = function () {
     // update x and y
     // if 'a' or 'd' is pressed, update x
     if (leftDown) {
-      x -= speed
+      paddle.x -= paddle.speed
     } else if (rightDown) {
-      x += speed
+      paddle.x += paddle.speed
     }
     // draw
     context.clearRect(0, 0, canvas.width, canvas.height)
-    context.drawImage(img, x, y)
+    context.drawImage(paddle.image, paddle.x, paddle.y)
   }, 1000/30)
 }
 
