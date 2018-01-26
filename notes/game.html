@@ -42,14 +42,38 @@ var Paddle = function () {
     y: 200,
     speed: 5,
   }
+  o.moveLeft = function() {
+    // this.x -= this.speed
+    o.x -= o.speed
+  }
+  o.moveRight = function() {
+    this.x += this.speed
+  }
   return o
 }
 
-var __main = function () {
+// this object abstract the whole game, and offer some functions like apis for
+// programmers to call, which is very useful for nice and clean code.
+var GuaGame = function() {
+  var g = new Object()
   var canvas = document.querySelector('#id-canvas')
   var context = canvas.getContext('2d') // 目前只支持二维
+  g.canvas = canvas
+  g.context = context
 
-  var paddle = new Paddle();
+  setInterval(function(){
+    //update
+    g.update()
+    //clear
+    g.context.clearRect(0, 0, g.canvas.width, g.canvas.height)
+    //draw
+    g.draw()
+  }, 1000/30)
+  return g
+}
+var __main = function () {
+  var game = GuaGame()
+  var paddle = Paddle()
   // var x = 100
   // var y = 200
   // var speed = 5
@@ -95,18 +119,35 @@ var __main = function () {
     }
   })
 
-  setInterval(function() {
-    // update x and y
-    // if 'a' or 'd' is pressed, update x
+  game.update = function() {
     if (leftDown) {
-      paddle.x -= paddle.speed
+      paddle.moveLeft()
     } else if (rightDown) {
-      paddle.x += paddle.speed
+      paddle.moveRight()
     }
-    // draw
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    context.drawImage(paddle.image, paddle.x, paddle.y)
-  }, 1000/30)
+  }
+
+  game.draw = function() {
+    game.context.drawImage(paddle.image, paddle.x, paddle.y)
+  }
+  // setInterval(function() {
+  //   // update x and y
+  //   // if 'a' or 'd' is pressed, update x
+  //   if (leftDown) {
+  //     // the action of paddle should be wrapped inside paddle object.
+  //     // which means that we need to create a new function for paddle itself.
+  //     // and outside paddle, the only thing we need to do is to call that function.
+  //     // we don't have to know the inside details about that function at here.
+  //     paddle.moveLeft()
+  //     // paddle.x -= paddle.speed
+  //   } else if (rightDown) {
+  //     paddle.moveRight()
+  //     // paddle.x += paddle.speed
+  //   }
+  //   // draw
+  //   game.context.clearRect(0, 0, game.canvas.width, game.canvas.height)
+  //   game.context.drawImage(paddle.image, paddle.x, paddle.y)
+  // }, 1000/30)
 }
 
 __main()
