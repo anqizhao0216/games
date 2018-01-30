@@ -28,13 +28,22 @@ var Paddle = function () {
     image: image,
     x: 100,
     y: 200,
-    speed: 5,
+    speed: 15,
   }
   o.moveLeft = function() {
     o.x -= o.speed
   }
   o.moveRight = function() {
     this.x += this.speed
+  }
+  o.collide = function(ball) {
+    if (ball.y + ball.image.height > o.y) {
+      if (ball.x > o.x && ball.x < o.x + o.image.width) {
+        return true
+      }
+    }
+
+    return false
   }
   return o
 }
@@ -55,15 +64,17 @@ var Ball = function () {
   }
   o.move = function() {
     if (o.fired) {
-      // log('move')
+      log('move')
       if (o.x < 0 || o.x > 400) {
         o.speedX = -o.speedX
       }
       if (o.y < 0 || o.y > 400) {
         o.speedY = -o.speedY
       }
+      o.x += o.speedX
+      o.y += o.speedY
     }
-    // o.x -= o.speed
+
   }
 
   return o
@@ -82,8 +93,8 @@ var GuaGame = function() {
   g.canvas = canvas
   g.context = context
 
-  g.drawImage = function(paddle) {
-    g.context.drawImage(paddle.image, paddle.x, paddle.y)
+  g.drawImage = function(obj) {
+    g.context.drawImage(obj.image, obj.x, obj.y)
   }
   // events
   window.addEventListener('keydown', function(event){
@@ -133,6 +144,11 @@ var __main = function () {
 
   game.update = function() {
     ball.move()
+
+    //collide
+    if (paddle.collide(ball)) {
+      ball.speedY *= -1
+    }
   }
   game.draw = function() {
     game.drawImage(paddle)
