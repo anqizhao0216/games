@@ -8,6 +8,7 @@
         border: 2px black solid;
       }
     </style>
+    <script src="levels.js" charset="utf-8"></script>
     <script src="util.js" charset="utf-8"></script>
     <script src="guagame.js" charset="utf-8"></script>
     <script src="paddle.js" charset="utf-8"></script>
@@ -21,22 +22,30 @@
 <script type="text/javascript">
 var log = console.log.bind(console)
 
+
+
+
+var loadlevel = function(n) {
+
+  var blocks = []
+
+  var level = levels[n-1]
+  for (var i = 0; i < level.length; i++){
+    var position = level[i]
+    blocks.push(Block(position))
+  }
+
+  return blocks
+}
+
+
 var __main = function () {
   var game = GuaGame(30)
   var paddle = Paddle()
   var ball = Ball()
-  // var block = Block()
 
-  var blocks = []
-  for (var i = 0; i < 3; i++) {
-    var b = Block()
-    //
-    b.x = i * 150
-    b.y = 50
-    blocks.push(b)
-
-  }
   var paused = false
+  var blocks = loadlevel(1)
   game.regiserAction('a', function() {
     paddle.moveLeft()
   })
@@ -47,8 +56,12 @@ var __main = function () {
     ball.fire()
   })
   window.addEventListener('keydown', function(event) {
-    if (event.key == 'p') {
+    var k = event.key
+    if (k == 'p') {
       paused = !paused
+    } else if ("123456789".includes(k)){
+      var n = Number(k)
+      blocks = loadlevel(n)
     }
   })
 
