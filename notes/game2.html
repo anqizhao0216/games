@@ -8,6 +8,11 @@
         border: 2px black solid;
       }
     </style>
+    <script src="util.js" charset="utf-8"></script>
+    <script src="guagame.js" charset="utf-8"></script>
+    <script src="paddle.js" charset="utf-8"></script>
+    <script src="block.js" charset="utf-8"></script>
+    <script src="ball.js" charset="utf-8"></script>
   </head>
   <body>
     <canvas id="id-canvas" width="400" height="300"></canvas>
@@ -16,122 +21,22 @@
 <script type="text/javascript">
 var log = console.log.bind(console)
 
-var imageFromPath = function(path) {
-  var img = new Image()
-  img.src = path
-  return img
-}
-
-var Paddle = function () {
-  var image = imageFromPath('paddle.png')
-  var o = {
-    image: image,
-    x: 100,
-    y: 200,
-    speed: 15,
-  }
-  o.moveLeft = function() {
-    o.x -= o.speed
-  }
-  o.moveRight = function() {
-    this.x += this.speed
-  }
-  o.collide = function(ball) {
-    if (ball.y + ball.image.height > o.y) {
-      if (ball.x > o.x && ball.x < o.x + o.image.width) {
-        return true
-      }
-    }
-
-    return false
-  }
-  return o
-}
-//
-var Ball = function () {
-  var image = imageFromPath('ball.png')
-  var o = {
-    image: image,
-    x: 100,
-    y: 200,
-    speedX: 10,
-    speedY: 10,
-    fired: false,
-  }
-  o.fire = function() {
-    o.fired = true
-    // o.move()
-  }
-  o.move = function() {
-    if (o.fired) {
-      log('move')
-      if (o.x < 0 || o.x > 400) {
-        o.speedX = -o.speedX
-      }
-      if (o.y < 0 || o.y > 400) {
-        o.speedY = -o.speedY
-      }
-      o.x += o.speedX
-      o.y += o.speedY
-    }
-
-  }
-
-  return o
-}
-
-
-// this object abstract the whole game, and offer some functions like apis for
-// programmers to call, which is very useful for nice and clean code.
-var GuaGame = function() {
-  var g = {
-    actions: {}, // store  callbacks
-    keydowns: {}, // store keys have been pressed
-  }
-  var canvas = document.querySelector('#id-canvas')
-  var context = canvas.getContext('2d') // 目前只支持二维
-  g.canvas = canvas
-  g.context = context
-
-  g.drawImage = function(obj) {
-    g.context.drawImage(obj.image, obj.x, obj.y)
-  }
-  // events
-  window.addEventListener('keydown', function(event){
-    g.keydowns[event.key] = true
-  })
-
-  window.addEventListener('keyup', function(event){
-    g.keydowns[event.key] = false
-  })
-
-  g.regiserAction = function(key, callback) {
-    g.actions[key] = callback
-  }
-
-  //timer
-  setInterval(function(){
-    //update
-    var actions = Object.keys(g.actions)
-    for (var i = 0; i < actions.length; i++) {
-      var key = actions[i]
-      if (g.keydowns[key]) {
-        g.actions[key]()
-      }
-    }
-    g.update()
-    //clear
-    g.context.clearRect(0, 0, g.canvas.width, g.canvas.height)
-    //draw
-    g.draw()
-  }, 1000/30)
-  return g
-}
 var __main = function () {
-  var game = GuaGame()
+  var game = GuaGame(30)
   var paddle = Paddle()
   var ball = Ball()
+  // var block = Block()
 
+  var blocks = []
+  for (var i = 0; i < 3; i++) {
+    var b = Block()
+    //
+    b.x = i * 150
+    b.y = 50
+    blocks.push(b)
+
+  }
+  var paused = false
   game.regiserAction('a', function() {
     paddle.moveLeft()
   })
@@ -141,18 +46,47 @@ var __main = function () {
   game.regiserAction('f', function() {
     ball.fire()
   })
+  window.addEventListener('keydown', function(event) {
+    if (event.key == 'p') {
+      paused = !paused
+    }
+  })
 
   game.update = function() {
+    if (paused) {
+      return
+    }
     ball.move()
 
     //collide
     if (paddle.collide(ball)) {
-      ball.speedY *= -1
+      ball.bounce()
     }
+
+
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i]
+      if (block.collide(ball)) {
+        log('block')
+        block.kill()
+        ball.bounce()
+      }
+
+    }
+    // ball & block collide
+
   }
   game.draw = function() {
+    // draw
     game.drawImage(paddle)
     game.drawImage(ball)
+    // draw blocks
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i]
+      if (block.alive) {
+          game.drawImage(block)
+      }
+    }
   }
 }
 
