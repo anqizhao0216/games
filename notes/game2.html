@@ -17,44 +17,29 @@
   </head>
   <body>
     <canvas id="id-canvas" width="400" height="300"></canvas>
-    <canvas id="canvas" width="400" height="300"></canvas>
+    <hr>
+    <input  id="fps-slider" type="range" value="1">
 
 <script type="text/javascript">
 var log = console.log.bind(console)
 
-
-
+var blocks = []
 
 var loadlevel = function(n) {
-
   var blocks = []
-
   var level = levels[n-1]
   for (var i = 0; i < level.length; i++){
     var position = level[i]
     blocks.push(Block(position))
   }
-
   return blocks
 }
 
-
-var __main = function () {
-  var game = GuaGame(30)
-  var paddle = Paddle()
-  var ball = Ball()
-
-  var paused = false
-  var blocks = loadlevel(1)
-  game.regiserAction('a', function() {
-    paddle.moveLeft()
-  })
-  game.regiserAction('d', function() {
-    paddle.moveRight()
-  })
-  game.regiserAction('f', function() {
-    ball.fire()
-  })
+var enableDebug = function(enable) {
+  if (!enable) {
+    return
+  }
+  window.paused = false
   window.addEventListener('keydown', function(event) {
     var k = event.key
     if (k == 'p') {
@@ -63,6 +48,33 @@ var __main = function () {
       var n = Number(k)
       blocks = loadlevel(n)
     }
+  })
+
+  document.querySelector('#fps-slider').addEventListener('input', function(event) {
+    window.fps = Number(event.target.value)
+  })
+
+}
+
+var __main = function () {
+  window.fps = 30
+  // var paused = false
+  enableDebug(true)
+  var game = GuaGame(30)
+  var paddle = Paddle()
+  var ball = Ball()
+
+
+  blocks = loadlevel(1)
+
+  game.regiserAction('a', function() {
+    paddle.moveLeft()
+  })
+  game.regiserAction('d', function() {
+    paddle.moveRight()
+  })
+  game.regiserAction('f', function() {
+    ball.fire()
   })
 
   game.update = function() {
@@ -76,7 +88,7 @@ var __main = function () {
       ball.bounce()
     }
 
-
+    // ball & block collide
     for (var i = 0; i < blocks.length; i++) {
       var block = blocks[i]
       if (block.collide(ball)) {
@@ -84,11 +96,9 @@ var __main = function () {
         block.kill()
         ball.bounce()
       }
-
     }
-    // ball & block collide
-
   }
+
   game.draw = function() {
     // draw
     game.drawImage(paddle)
@@ -104,6 +114,7 @@ var __main = function () {
 }
 
 __main()
+
 </script>
   </body>
 </html>
