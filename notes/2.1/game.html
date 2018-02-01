@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>game 1-13</title>
+    <style media="screen">
+      #id-canvas {
+        border: 2px black solid;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="id-canvas" width="400" height="300"></canvas>
+    <canvas id="canvas" width="400" height="300"></canvas>
+
+<script type="text/javascript">
+// var log = console.log 貌似直接赋值就可以了，所以bind在这里的作用是什么呢
+// bind 绑定console对象，将this指向console对象。并返回一个函数。
+var log = console.log.bind(console) // console 是一个什么对象？
+// log 是一个函数
+
+// 代码重构要求：
+// 1.最外层只能有函数
+// 2.把paddle抽象成一个对象，所有与之相关的变量和函数都在paddle对象里
+// 3.window.addEventListener中只绑定事件和回调函数，别的不管
+
+
+
+var imageFromPath = function(path) {
+  var img = new Image()
+  img.src = path
+  return img
+}
+// 2. 定义一个paddle对象
+// 匿名函数内部，定义一个对象，然后返回这个对象？
+// 这是工厂模式
+var Paddle = function () {
+  var image = imageFromPath('paddle.png')
+  var o = {
+    image: image,
+    x: 100,
+    y: 200,
+    speed: 5,
+  }
+  o.moveLeft = function() {
+    // this.x -= this.speed
+    o.x -= o.speed
+  }
+  o.moveRight = function() {
+    this.x += this.speed
+  }
+  return o
+}
+
+// this object abstract the whole game, and offer some functions like apis for
+// programmers to call, which is very useful for nice and clean code.
+var GuaGame = function() {
+  var g = new Object()
+  var canvas = document.querySelector('#id-canvas')
+  var context = canvas.getContext('2d') // 目前只支持二维
+  g.canvas = canvas
+  g.context = context
+
+  setInterval(function(){
+    //update
+    g.update()
+    //clear
+    g.context.clearRect(0, 0, g.canvas.width, g.canvas.height)
+    //draw
+    g.draw()
+  }, 1000/30)
+  return g
+}
+var __main = function () {
+  var game = GuaGame()
+  var paddle = Paddle()
+  // var x = 100
+  // var y = 200
+  // var speed = 5
+
+  // var img = new Image() // 创建一个<img> 。等价于 document.createElement('img')
+  // img.src = 'paddle.png' // 脚本执行后，图片开始装载
+  // log(img)
+  // // 若调用 drawImage 时，图片没装载完，那什么都不会发生（在一些旧的浏览器中可能会抛出异常）。
+  // // 因此你应该用load事件来保证不会在加载完毕之前使用这个图片
+  // img.onload = function() {
+  //     context.drawImage(img, x, y)
+  // }
+
+  var leftDown = false
+  var rightDown = false
+  //events 给这个paddle加上事件
+
+
+
+
+// 3. 再写一个函数，传入event.key
+  window.addEventListener('keydown', function(event) {
+    // log('keydown')
+    // log(event)
+    var k = event.key
+    if (k == 'a') {
+        leftDown = true
+        //本来情况下，keydown按下不动，绑定的事件一秒内只能触发十几次。
+        // paddle运动会显得不够流畅,所以用setInterval人为规定触发次数
+        // context.clearRect(0, 0, canvas.width, canvas.height)
+        // context.drawImage(img, x, y)
+    } else if (k == 'd') {
+        rightDown = true
+    }
+  })
+
+  window.addEventListener('keyup', function(event) {
+    var k = event.key
+    if (k == 'a') {
+      leftDown = false
+    } else if (k == 'd') {
+      rightDown = false
+    }
+  })
+
+  game.update = function() {
+    if (leftDown) {
+      paddle.moveLeft()
+    } else if (rightDown) {
+      paddle.moveRight()
+    }
+  }
+
+  game.draw = function() {
+    game.context.drawImage(paddle.image, paddle.x, paddle.y)
+  }
+  // setInterval(function() {
+  //   // update x and y
+  //   // if 'a' or 'd' is pressed, update x
+  //   if (leftDown) {
+  //     // the action of paddle should be wrapped inside paddle object.
+  //     // which means that we need to create a new function for paddle itself.
+  //     // and outside paddle, the only thing we need to do is to call that function.
+  //     // we don't have to know the inside details about that function at here.
+  //     paddle.moveLeft()
+  //     // paddle.x -= paddle.speed
+  //   } else if (rightDown) {
+  //     paddle.moveRight()
+  //     // paddle.x += paddle.speed
+  //   }
+  //   // draw
+  //   game.context.clearRect(0, 0, game.canvas.width, game.canvas.height)
+  //   game.context.drawImage(paddle.image, paddle.x, paddle.y)
+  // }, 1000/30)
+}
+
+__main()
+</script>
+  </body>
+</html>

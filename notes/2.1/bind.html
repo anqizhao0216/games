@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">资料来源</a>
+    <ol>
+      <li>
+        <p>创建绑定函数</p>
+      </li>
+      <li>
+        <p>配合setTimeout使用</p>
+      </li>
+    </ol>
+
+
+  </body>
+<script type="text/javascript">
+
+var log = console.log.bind(console)
+
+//-----------------------------------------------------------------------------
+// bind() 最简单的用法是创建一个函数，使这个函数不论怎么调用都有同样的 this 值.
+this.x = 9;
+var module = {
+  x: 81,
+  getX: function() { return this.x; }
+};
+
+log(module.getX()) // 返回 81
+
+var retrieveX = module.getX;
+log(retrieveX()) // 返回 9, 在这种情况下，"this"指向全局作用域
+
+// 创建一个新函数，将"this"绑定到module对象
+// 新手可能会被全局的x变量和module里的属性x所迷惑
+var boundGetX = retrieveX.bind(module);
+log(boundGetX()) // 返回 81
+
+//-----------------------------------------------------------------------------
+// 配合 setTimeout
+// 在默认情况下，使用 window.setTimeout() 时，
+// this 关键字会指向 window （或全局）对象。当使用类的方法时，
+// 需要 this 引用类的实例，你可能需要显式地把 this 绑定到回调函数以便继续使用实例。
+var LateBloomer = function() {
+  this.petalCount = Math.ceil(Math.random() * 12) + 1
+}
+// declare bloom after a delay of 1 second
+LateBloomer.prototype.bloom = function() {
+  //第一个参数是一个回调函数，一秒之后会自动执行。如果再后面加上小括号的话，就是立即执行
+  //没有了settimeout的意义。但是这样的话指向的就是window中的全局变量，而不是当前的对象
+  //所以需要用bind绑定this
+  window.setTimeout(this.declare.bind(this), 1000)
+}
+
+LateBloomer.prototype.declare = function() {
+  log('I am a flower with '  + this.petalCount + ' petals!')
+}
+
+var flower = new LateBloomer()
+flower.bloom()
+
+//-----------------------------------------------------------------------------
+
+</script>
+</html>
