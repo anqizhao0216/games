@@ -25,17 +25,17 @@ var log = console.log.bind(console)
 
 var blocks = []
 
-var loadlevel = function(n) {
+var loadlevel = function(game, n) {
   var blocks = []
   var level = levels[n-1]
   for (var i = 0; i < level.length; i++){
     var position = level[i]
-    blocks.push(Block(position))
+    blocks.push(Block(game, position))
   }
   return blocks
 }
 
-var enableDebug = function(enable) {
+var enableDebug = function(game, enable) {
   if (!enable) {
     return
   }
@@ -46,7 +46,7 @@ var enableDebug = function(enable) {
       paused = !paused
     } else if ("123456789".includes(k)){
       var n = Number(k)
-      blocks = loadlevel(n)
+      blocks = loadlevel(game, n)
     }
   })
 
@@ -59,58 +59,67 @@ var enableDebug = function(enable) {
 var __main = function () {
   window.fps = 30
   // var paused = false
-  enableDebug(true)
-  var game = GuaGame(30)
-  var paddle = Paddle()
-  var ball = Ball()
+  var images = {
+    ball: 'ball.png',
+    block: 'block.png',
+    paddle: 'paddle.png'
+  }
 
 
-  blocks = loadlevel(1)
+  var game = GuaGame(images, 30, function(g){
+    var paddle = Paddle(game)
+    var ball = Ball(game)
 
-  game.regiserAction('a', function() {
-    paddle.moveLeft()
-  })
-  game.regiserAction('d', function() {
-    paddle.moveRight()
-  })
-  game.regiserAction('f', function() {
-    ball.fire()
-  })
 
-  game.update = function() {
-    if (paused) {
-      return
-    }
-    ball.move()
+    blocks = loadlevel(game, 1)
 
-    //collide
-    if (paddle.collide(ball)) {
-      ball.bounce()
-    }
+    game.regiserAction('a', function() {
+      paddle.moveLeft()
+    })
+    game.regiserAction('d', function() {
+      paddle.moveRight()
+    })
+    game.regiserAction('f', function() {
+      ball.fire()
+    })
 
-    // ball & block collide
-    for (var i = 0; i < blocks.length; i++) {
-      var block = blocks[i]
-      if (block.collide(ball)) {
-        log('block')
-        block.kill()
+    game.update = function() {
+      if (paused) {
+        return
+      }
+      ball.move()
+
+      //collide
+      if (paddle.collide(ball)) {
         ball.bounce()
       }
-    }
-  }
 
-  game.draw = function() {
-    // draw
-    game.drawImage(paddle)
-    game.drawImage(ball)
-    // draw blocks
-    for (var i = 0; i < blocks.length; i++) {
-      var block = blocks[i]
-      if (block.alive) {
-          game.drawImage(block)
+      // ball & block collide
+      for (var i = 0; i < blocks.length; i++) {
+        var block = blocks[i]
+        if (block.collide(ball)) {
+          log('block')
+          block.kill()
+          ball.bounce()
+        }
       }
     }
-  }
+
+    game.draw = function() {
+      // draw
+      game.drawImage(paddle)
+      game.drawImage(ball)
+      // draw blocks
+      for (var i = 0; i < blocks.length; i++) {
+        var block = blocks[i]
+        if (block.alive) {
+            game.drawImage(block)
+        }
+      }
+    }
+  })
+  enableDebug(game, true)
+
 }
 
 __main()
