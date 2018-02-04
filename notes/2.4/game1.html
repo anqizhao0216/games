@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>game 1-13</title>
+    <style media="screen">
+      #id-canvas {
+        border: 2px black solid;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="id-canvas" width="400" height="300"></canvas>
+    <canvas id="canvas" width="400" height="300"></canvas>
+
+<script type="text/javascript">
+var log = console.log.bind(console)
+// log 是一个函数
+
+// 代码重构要求：
+// 1.最外层只能有函数
+// 2.把paddle抽象成一个对象，所有与之相关的变量和函数都在paddle对象里
+// 3.window.addEventListener中只绑定事件和回调函数，别的不管
+
+var imageFromPath = function(path) {
+  var img = new Image()
+  img.src = path
+  return img
+}
+// 2. 定义一个paddle对象
+var Paddle = function () {
+  var image = imageFromPath('paddle.png')
+  var o = {
+    image: image,
+    x: 100,
+    y: 200,
+    speed: 5,
+  }
+  o.moveLeft = function() {
+    // this.x -= this.speed
+    o.x -= o.speed
+  }
+  o.moveRight = function() {
+    this.x += this.speed
+  }
+  return o
+}
+
+// this object abstract the whole game, and offer some functions like apis for
+// programmers to call, which is very useful for nice and clean code.
+var GuaGame = function() {
+  var g = {
+    actions: {}, // store  callbacks
+    keydowns: {}, // store keys have been pressed
+  }
+  var canvas = document.querySelector('#id-canvas')
+  var context = canvas.getContext('2d') // 目前只支持二维
+  g.canvas = canvas
+  g.context = context
+
+  g.drawImage = function(paddle) {
+    g.context.drawImage(paddle.image, paddle.x, paddle.y)
+  }
+  // events
+  window.addEventListener('keydown', function(event){
+    g.keydowns[event.key] = true // why we can [] to fetch the data store inside an object
+  })
+
+  window.addEventListener('keyup', function(event){
+    g.keydowns[event.key] = false
+  })
+
+  g.regiserAction = function(key, callback) {
+    g.actions[key] = callback
+  }
+
+  //timer
+  setInterval(function(){
+    //update
+    var actions = Object.keys(g.actions)
+    for (var i = 0; i < actions.length; i++) {
+      var key = actions[i]
+      if (g.keydowns[key]) {
+        g.actions[key]()
+      }
+    }
+
+    // g.update()
+    //clear
+    g.context.clearRect(0, 0, g.canvas.width, g.canvas.height)
+    //draw
+    g.draw()
+  }, 1000/30)
+
+  return g
+}
+var __main = function () {
+  var game = GuaGame()
+  var paddle = Paddle()
+
+  // var leftDown = false
+  // var rightDown = false
+// 3. 再写一个函数，传入event.key
+
+  game.regiserAction('a', function() {
+    paddle.moveLeft()
+  })
+
+  game.regiserAction('d', function() {
+    paddle.moveRight()
+  })
+
+  // window.addEventListener('keydown', function(event) {
+  //   // log('keydown')
+  //   // log(event)
+  //   var k = event.key
+  //   if (k == 'a') {
+  //       leftDown = true
+  //   } else if (k == 'd') {
+  //       rightDown = true
+  //   }
+  // })
+  //
+  // window.addEventListener('keyup', function(event) {
+  //   var k = event.key
+  //   if (k == 'a') {
+  //     leftDown = false
+  //   } else if (k == 'd') {
+  //     rightDown = false
+  //   }
+  // })
+
+  // game.update = function() {
+  //   if (leftDown) {
+  //     paddle.moveLeft()
+  //   } else if (rightDown) {
+  //     paddle.moveRight()
+  //   }
+  // }
+
+  game.draw = function() {
+    // game.context.drawImage(paddle.image, paddle.x, paddle.y)
+    game.drawImage(paddle)
+  }
+}
+
+__main()
+</script>
+  </body>
+</html>
