@@ -96,7 +96,7 @@ var GuaGame = function(images, fps, callback) {
   g.runWithScene = function(scene) {
     g.scene = scene
     setTimeout(function(){
-      // runloop()
+      runloop()
     }, 1000/window.fps)
   }
   g.replaceScene = function(scene) {
