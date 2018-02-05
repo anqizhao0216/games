@@ -111,3 +111,4 @@ scene对象里有paddle，block，ball
 在这个scene里注册game的操作事件
 ```
 
+为什么会感觉太绕了呢?
